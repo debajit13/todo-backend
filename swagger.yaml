@@ -1,0 +1,229 @@
+openapi: 3.0.0
+info:
+  title: Todo Backend
+  description: A sample backend for a simple todo backend
+  version: 0.1.0
+  contact:
+    name: Debajit Mallick
+    email: mallickdebajit@gmail.com
+    url: https://debajitmallick.com/
+
+servers:
+  - url: http://localhost:4000/api/v1
+
+paths:
+  /:
+    get:
+      tags:
+        - Home
+      summary: returns a json to welcome the user to todo-backend
+      responses:
+        '200':
+          description: returns an object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+                    default: Welcome to todo backend
+  /todos:
+    get:
+      tags:
+        - Todo related APIs
+      summary: returns all the todos from the db
+      responses:
+        '200':
+          description: returns an object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+                    default: All todos retrived successfully!
+                  todos:
+                    type: array
+                    default: []
+    post:
+      tags:
+        - Todo related APIs
+      summary: add a new todo to the todos db
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: test api title
+                description:
+                  type: string
+                  default: test api desription
+      responses:
+        '201':
+          description: returns an object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+                    default: todo added successfully!
+                  todo:
+                    type: object
+                    default: {}
+        '400':
+          description: returns an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: true
+                  message:
+                    type: string
+                    default: title and description are required fields!
+    delete:
+      tags:
+        - Todo related APIs
+      summary: delete a todo by Id from todos DB
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          description: The id of the todo you want to delete
+      responses:
+        '200':
+          description: returns an object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+                    default: todo deleted successfully!
+                  status:
+                    type: object
+                    default: {}
+        '404':
+          description: returns an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: true
+                  message:
+                    type: string
+                    default: todo not found!
+        '400':
+          description: returns an error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: true
+                  message:
+                    type: string
+                    default: "'id' is a required field!"
+    put:
+      tags:
+        - Todo related APIs
+      summary: edit a todo by Id from todos DB
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          description: The id of the todo you want to edit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  default: test api title
+                description:
+                  type: string
+                  default: test api desription
+                isDone:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: returns an object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+                    default: todo updated successfully!
+        '422':
+          description: returns an error if any of title or description are missing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: true
+                  message:
+                    type: string
+                    default: title and description are required fields!
+        '400':
+          description: returns an error if id is missing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: true
+                  message:
+                    type: string
+                    default: "'id' is a required field!"
