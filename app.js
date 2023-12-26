@@ -5,11 +5,13 @@ const app = express();
 const YAML = require('yaml');
 const swaggerUI = require('swagger-ui-express');
 const fs = require('fs');
+const cors = require('cors');
 const file = fs.readFileSync('./swagger.yaml', 'utf8');
 const swaggerDocument = YAML.parse(file);
 const Todo = require('./models/todo');
 
 app.use(express.json());
+app.use(cors());
 // route to swagger api documentation
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 

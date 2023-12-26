@@ -10,6 +10,9 @@ info:
 
 servers:
   - url: http://localhost:4000/api/v1
+    description: use this if you are running the repo in localhost
+  - url: https://api-todos-qcwl.onrender.com/api/v1
+    description: use this if you want to try the the api connected with db
 
 paths:
   /:
