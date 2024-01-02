@@ -1,6 +1,7 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 
-const auth = (req, res, next) => {
+const auth = (req: Request, res: Response, next: NextFunction) => {
   let token = req.header('Authorization');
   token = token && token.replace('Bearer ', '');
 
@@ -12,8 +13,10 @@ const auth = (req, res, next) => {
   }
 
   try {
-    const decode = jwt.verify(token, process.env.SECRET);
-    req.user = decode;
+    const decode = jwt.verify(token, process.env.SECRET || 'TodoBackend');
+    if ('user' in req) {
+      req['user'] = decode;
+    }
   } catch (error) {
     return res.status(401).json({
       error: true,
@@ -24,4 +27,4 @@ const auth = (req, res, next) => {
   return next();
 };
 
-module.exports = auth;
+export default auth;
