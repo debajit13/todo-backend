@@ -1,26 +1,30 @@
-require('dotenv').config();
-require('./config/database').connect;
-const express = require('express');
-const app = express();
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const YAML = require('yaml');
-const swaggerUI = require('swagger-ui-express');
-const fs = require('fs');
-const cors = require('cors');
-const file = fs.readFileSync('./swagger.yaml', 'utf8');
+import dotenv from 'dotenv';
+import connect from './config/database';
+connect;
+import express, { Express, Request, Response } from 'express';
+const app: Express = express();
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import YAML from 'yaml';
+import swaggerUI from 'swagger-ui-express';
+import fs from 'fs';
+import cors from 'cors';
+import path from 'path';
+const swaggerPath = path.resolve(__dirname, '../swagger.yaml');
+const file: string = fs.readFileSync(swaggerPath, 'utf8');
 const swaggerDocument = YAML.parse(file);
-const Todo = require('./models/todo');
-const User = require('./models/user');
-const auth = require('./middleware/auth');
+import Todo from './models/todo';
+import User from './models/user';
+import auth from './middleware/auth';
 
+dotenv.config();
 app.use(express.json());
 app.use(cors());
 // route to swagger api documentation
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 // route to homepage of our api
-app.get('/api/v1/', (req, res) => {
+app.get('/api/v1/', (req: Request, res: Response) => {
   return res.status(200).json({
     error: false,
     message: 'Welcome to todo backend',
@@ -28,7 +32,7 @@ app.get('/api/v1/', (req, res) => {
 });
 
 // route to register
-app.post('/api/v1/register', async (req, res) => {
+app.post('/api/v1/register', async (req: Request, res: Response) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
@@ -48,7 +52,7 @@ app.post('/api/v1/register', async (req, res) => {
       });
     }
 
-    const encryptedPassword = await bcrypt.hash(password, 10);
+    const encryptedPassword: string = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       firstName,
@@ -63,7 +67,7 @@ app.post('/api/v1/register', async (req, res) => {
           user_id: user._id,
           email,
         },
-        process.env.SECRET,
+        process.env.SECRET || 'Backend-ToDo',
         {
           expiresIn: '2h',
         }
@@ -83,7 +87,7 @@ app.post('/api/v1/register', async (req, res) => {
 });
 
 // route to login
-app.post('/api/v1/login', async (req, res) => {
+app.post('/api/v1/login', async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
@@ -105,13 +109,17 @@ app.post('/api/v1/login', async (req, res) => {
       });
     }
 
-    if (user && bcrypt.compare(password, user.password)) {
+    if (
+      user &&
+      user?.password &&
+      (await bcrypt.compare(password, user?.password))
+    ) {
       const token = jwt.sign(
         {
           user_id: user._id,
           email,
         },
-        process.env.SECRET,
+        process.env.SECRET || 'Backend-ToDo',
         {
           expiresIn: '2h',
         }
@@ -131,7 +139,7 @@ app.post('/api/v1/login', async (req, res) => {
 });
 
 // route to get all the todos
-app.get('/api/v1/todos', auth, async (req, res) => {
+app.get('/api/v1/todos', auth, async (req: Request, res: Response) => {
   const todos = await Todo.find({});
 
   return res.status(200).json({
@@ -142,7 +150,7 @@ app.get('/api/v1/todos', auth, async (req, res) => {
 });
 
 // route to add new todo
-app.post('/api/v1/todos', auth, async (req, res) => {
+app.post('/api/v1/todos', auth, async (req: Request, res: Response) => {
   try {
     const { title, description } = req.body;
 
@@ -169,7 +177,7 @@ app.post('/api/v1/todos', auth, async (req, res) => {
 });
 
 // route to delete a todo by Id
-app.delete('/api/v1/todos', auth, async (req, res) => {
+app.delete('/api/v1/todos', auth, async (req: Request, res: Response) => {
   const _id = req.query.id;
 
   if (!_id) {
@@ -198,7 +206,7 @@ app.delete('/api/v1/todos', auth, async (req, res) => {
 });
 
 // route to update a todo by Id
-app.put('/api/v1/todos', auth, async (req, res) => {
+app.put('/api/v1/todos', auth, async (req: Request, res: Response) => {
   const _id = req.query.id;
   const { title, description, isDone } = req.body;
 
@@ -226,4 +234,4 @@ app.put('/api/v1/todos', auth, async (req, res) => {
   });
 });
 
-module.exports = app;
+export default app;
