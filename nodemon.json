@@ -1,5 +1,5 @@
 {
-  "watch": ["src"],
+  "watch": ["src", "./swagger.yaml"],
   "ext": "js, jsx, yml, yaml, ts",
   "exec": "concurrently \"npx tsc --watch\" \"ts-node src/index.ts\""
 }

@@ -14,6 +14,13 @@ servers:
   - url: https://api-todos-qcwl.onrender.com/api/v1
     description: use this if you want to try the the api connected with db
 
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
 paths:
   /:
     get:
@@ -34,11 +41,159 @@ paths:
                   message:
                     type: string
                     default: Welcome to todo backend
+  /login:
+    post:
+      tags:
+        - Auth APIs
+      summary: login with email and password
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: johndoe@gmail.com
+                password:
+                  type: string
+                  default: 123456
+      responses:
+        '200':
+          description: returns an object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+                    default: User loggedIn successfully!
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        default: 1234556778a34r23r
+                      firstName:
+                        type: string
+                        default: John
+                      lastName:
+                        type: string
+                        default: Doe
+                      email:
+                        type: string
+                        default: johndoe@gmail.com
+                      __v:
+                        type: number
+                        default: 0
+                      token:
+                        type: string
+                        default: dsadsda23231dsaweadaseqweqdsadwaewqewqeqeeq3213easdadads32adsda
+        '400':
+          description: returns an object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: true
+                  message:
+                    type: string
+                    default: User hasn't registered yet!
+  /register:
+    post:
+      tags:
+        - Auth APIs
+      summary: register a new user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  default: Jahn
+                lastName:
+                  type: string
+                  default: Doe
+                email:
+                  type: string
+                  default: janedoe@gmail.com
+                password:
+                  type: string
+                  default: 123456
+      responses:
+        '200':
+          description: returns an object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: false
+                  message:
+                    type: string
+                    default: User created successfully!
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        default: 1234556778a34r23r
+                      firstName:
+                        type: string
+                        default: Jahn
+                      lastName:
+                        type: string
+                        default: Doe
+                      email:
+                        type: string
+                        default: janedoe@gmail.com
+                      __v:
+                        type: number
+                        default: 0
+                      token:
+                        type: string
+                        default: dsadsda23231dsaweadaseqweqdsadwaewqewqeqeeq3213easdadads32adsda
+        '400':
+          description: returns an object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    default: true
+                  message:
+                    type: string
+                    default: User is already existed!
   /todos:
     get:
       tags:
-        - Todo related APIs
+        - Todo APIs
       summary: returns all the todos from the db
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: returns an object
@@ -58,8 +213,10 @@ paths:
                     default: []
     post:
       tags:
-        - Todo related APIs
+        - Todo APIs
       summary: add a new todo to the todos db
+      security:
+        - bearerAuth: []
       consumes:
         - application/json
       produces:
@@ -109,8 +266,10 @@ paths:
                     default: title and description are required fields!
     delete:
       tags:
-        - Todo related APIs
+        - Todo APIs
       summary: delete a todo by Id from todos DB
+      security:
+        - bearerAuth: []
       produces:
         - application/json
       parameters:
@@ -164,8 +323,10 @@ paths:
                     default: "'id' is a required field!"
     put:
       tags:
-        - Todo related APIs
+        - Todo APIs
       summary: edit a todo by Id from todos DB
+      security:
+        - bearerAuth: []
       produces:
         - application/json
       parameters:
